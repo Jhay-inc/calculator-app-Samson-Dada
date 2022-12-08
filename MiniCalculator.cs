@@ -1,4 +1,4 @@
-using System.Diagnostics.Eventing.Reader;
+﻿using System.Diagnostics.Eventing.Reader;
 
 namespace CalculatorApp
 {
@@ -6,113 +6,144 @@ namespace CalculatorApp
     {
         private double resultValue = 0;
         public string operation = String.Empty;
-        //public object senderObj = Object;
-        public Button? btn;
-        private bool isOperationPerformed = false;
+        string firstNumber, secondNumber;
+        public Button btn;
+        public bool isEnterValue = false;
 
         public MiniCalculator()
         {
             InitializeComponent();
         }
 
-        // Numbers
+        // Numbers operation
         private void ButtonNumber_Click(object sender, EventArgs e)
         {
-            if ((textBoxDisplayOutput.Text == "0") || (isOperationPerformed))
-            {
-                textBoxDisplayOutput.Clear();
+            if (textBoxDisplayOutput.Text == "0" || isEnterValue)
+            {  
+                textBoxDisplayOutput.Text = string.Empty;
             }
-            isOperationPerformed = false;
-            btn = (Button)sender;
-            if(btn.Text == ".")
+            isEnterValue = false;
+            Button btn = (Button)sender;
+            if (btn.Text == ".")
             {
-                if (!textBoxDisplayOutput.Text.Contains('.'))
-                {
+                if (textBoxDisplayOutput.Text.Contains('.'))
                     textBoxDisplayOutput.Text = textBoxDisplayOutput.Text + btn.Text;
-                }
             }
-            else 
-            {
-            textBoxDisplayInput.Text = textBoxDisplayInput.Text + btn.Text;
-            }
+            else textBoxDisplayOutput.Text = textBoxDisplayOutput.Text + btn.Text;
+                //textBoxDisplayInput.Text = textBoxDisplayInput.Text + btn.Text;
+
         }
 
+       
 
         // Math operation
         private void BtnMathOperation_Click(object sender, EventArgs e)
         {
             btn = (Button)sender;
             operation = btn.Text;
-            //resultValue = Double.Parse(textBoxDisplayOutput.Text);
-            textBoxDisplayInput.Text = resultValue + " " + operation;
-            isOperationPerformed = true;
-            /*
-             
-             Button button = (Button)sender;
-
+            isEnterValue = true;
             if (resultValue != 0)
-            {
-                button15.PerformClick();
-                operationPerformed = button.Text;
-                labelCurrentOperation.Text = resultValue + " " + operationPerformed;
-                isOperationPerformed = true;
-            }
+                Button_Equals.PerformClick();
             else
             {
-
-                operationPerformed = button.Text;
-                resultValue = Double.Parse(textBox_Result.Text);
-                labelCurrentOperation.Text = resultValue + " " + operationPerformed;
-                isOperationPerformed = true;
+                resultValue = Double.Parse(textBoxDisplayOutput.Text);
             }
-             
-             */
-
+            if (textBoxDisplayOutput.Text != "0")
+            {
+                textBoxDisplayInput.Text = firstNumber = $"{resultValue}{operation}";
+                textBoxDisplayOutput.Text = string.Empty;
+            }
         }
 
-        // Clear input
+
+        // 
+
+        private void ButtonEqual_Click(object sender, EventArgs e)
+        {
+            secondNumber = textBoxDisplayOutput.Text;
+            textBoxDisplayInput.Text = $"{textBoxDisplayInput.Text}{textBoxDisplayOutput.Text}=";
+            //textBoxDisplayOutput.Text = textBoxDisplayInput.Text + textBoxDisplayOutput.Text;
+            if (textBoxDisplayOutput.Text != string.Empty)
+            {
+
+                if (textBoxDisplayOutput.Text == "0") textBoxDisplayInput.Text = string.Empty;
+                switch (operation)
+                {
+                    case "+":
+                        textBoxDisplayOutput.Text = (resultValue + Double.Parse(textBoxDisplayOutput.Text)).ToString();
+                       BoxHistoryDisplay.AppendText(text:$" \a{ firstNumber} {secondNumber} = {textBoxDisplayOutput.Text}\n");
+                        break;
+                    case "-":
+                        textBoxDisplayOutput.Text = (resultValue - Double.Parse(textBoxDisplayOutput.Text)).ToString();
+                        BoxHistoryDisplay.AppendText(text: $" \a{ firstNumber} {secondNumber} = {textBoxDisplayOutput.Text}\n");
+                        break;
+                    case "x":
+                        textBoxDisplayOutput.Text = (resultValue * Double.Parse(textBoxDisplayOutput.Text)).ToString();
+                        BoxHistoryDisplay.AppendText(text:$"\a {firstNumber} {secondNumber} = {textBoxDisplayOutput.Text}\n");
+                        break;
+                    case "÷":
+                        textBoxDisplayOutput.Text = (resultValue / Double.Parse(textBoxDisplayOutput.Text)).ToString();
+                        BoxHistoryDisplay.AppendText(text:$" \a {firstNumber} {secondNumber} = {textBoxDisplayOutput.Text}\n");
+                        break;
+                    default: 
+                        textBoxDisplayInput.Text = $"{textBoxDisplayOutput.Text}=";
+                        break;
+                }
+                resultValue = Double.Parse(textBoxDisplayOutput.Text);
+                textBoxDisplayInput.Text = string.Empty;
+            }
+        }
+
+        private void ButtonOperations(object sender, EventArgs e)
+        {
+            Button btn = (Button)sender;
+            operation = btn.Text;
+            switch (operation)
+            {
+                case "√x":
+                    textBoxDisplayInput.Text = $"√({textBoxDisplayOutput.Text})";
+                    textBoxDisplayOutput.Text = Convert.ToString(Math.Sqrt(Double.Parse(textBoxDisplayOutput.Text)));
+                    break;
+                case "x2":
+                    textBoxDisplayInput.Text = $"({textBoxDisplayOutput.Text})x2";
+                    textBoxDisplayOutput.Text = Convert.ToString(Convert.ToDouble(textBoxDisplayOutput.Text) * Convert.ToDouble(textBoxDisplayOutput.Text));
+                    break;
+                case "1/x":
+                    textBoxDisplayInput.Text = $"1/({textBoxDisplayOutput.Text})";
+                    textBoxDisplayOutput.Text = Convert.ToString(1.0 / Convert.ToDouble(textBoxDisplayOutput.Text));
+                    break;
+                case "%":
+                    textBoxDisplayInput.Text = $"%({textBoxDisplayOutput.Text})";
+                    textBoxDisplayOutput.Text = Convert.ToString(Convert.ToDouble(textBoxDisplayOutput.Text) / Convert.ToDouble(100));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // Clear input data........................
         private void Button_Clear_Click(object sender, EventArgs e)
         {
-            if (textBoxDisplayInput.Text.Length > 0)
-            {
-                //textBoxDisplayOutput.Text = "0";
-                textBoxDisplayInput.Text =  textBoxDisplayInput.Text.Remove(textBoxDisplayInput.Text.Length-1, 1);
-
-            }
+            //if (textBoxDisplayInput.Text.Length > 0)
+            //{
+            //    textBoxDisplayOutput.Text = "0";
+            //    textBoxDisplayInput.Text = textBoxDisplayInput.Text.Remove(textBoxDisplayInput.Text.Length - 1, 1);
+            //}
+            textBoxDisplayOutput.Text = "0";
+            textBoxDisplayInput.Text = string.Empty;
             resultValue = 0;
         }
-
-        //Clear all Input
+       
         private void Button_ClearAll_Click(object sender, EventArgs e)
         {
             textBoxDisplayOutput.Text = "0";
             textBoxDisplayInput.Text = "";
         }
 
-        private void ButtonEqual_Click(object sender, EventArgs e)
+
+        private void BtnHistory_Click(object sender, EventArgs e)
         {
-            switch (operation)
-            {
-                case "+":
-                    textBoxDisplayOutput.Text = (resultValue + Double.Parse(textBoxDisplayOutput.Text)).ToString();
-                    break;
-                case "_":
-                    textBoxDisplayOutput.Text = (resultValue- Double.Parse(textBoxDisplayOutput.Text)).ToString();
-                    break;
-                case "*":
-                    textBoxDisplayOutput.Text = (resultValue * Double.Parse(textBoxDisplayOutput.Text)).ToString();
-                    break;
-                case "/":
-                    textBoxDisplayOutput.Text = (resultValue / Double.Parse(textBoxDisplayOutput.Text)).ToString();
-                    break;
-                 default:
-                    break;
-
-                    resultValue = Double.Parse(textBoxDisplayOutput .Text);
-                    textBoxDisplayInput.Text = "";
-
-            }
-
+            panelHistory.Height =(panelHistory.Height==5)?panelHistory.Height = 345:5;
         }
     }
 }
